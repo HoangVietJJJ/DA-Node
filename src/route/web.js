@@ -1,6 +1,6 @@
 import express from "express";
 import homeController from "../controllers/homeController";
-import userController from "../controllers/userController";
+import userController from "../controllers/usercontroller";
 
 let router = express.Router();
 
