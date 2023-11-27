@@ -1,6 +1,6 @@
 import db from "../models/index";
 require('dotenv').config();
-import _, { reject } from 'lodash';
+import _ from 'lodash';
 
 const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE;
 
@@ -92,7 +92,6 @@ let saveDoctorInfo = (inputData) => {
                         doctormarkdown.contentHTML = inputData.contentHTML;
                         doctormarkdown.contentMarkdown = inputData.contentMarkdown;
                         doctormarkdown.description = inputData.description;
-                        //doctormarkdown.updatedAt = new Date();
 
                         await doctormarkdown.save()
                     }
@@ -100,9 +99,7 @@ let saveDoctorInfo = (inputData) => {
 
                 //insert to doctor info
                 let extraInfor = await db.Doctor_Infor.findOne({
-                    where: {
-                        doctorId: inputData.doctorId,
-                    },
+                    where: { doctorId: inputData.doctorId },
                     raw: false
                 })
                 if (extraInfor) {
@@ -129,11 +126,11 @@ let saveDoctorInfo = (inputData) => {
                         addressClinic: inputData.addressClinic,
                         note: inputData.note,
                     })
-                    resolve({
-                        errCode: 0,
-                        errMessage: `Doctor's informations is saved successfully!`
-                    })
                 }
+                resolve({
+                    errCode: 0,
+                    errMessage: `Doctor's informations is saved successfully!`
+                })
             }
         } catch (e) {
             reject(e)
@@ -158,8 +155,29 @@ let getDetailDoctorById = (inputId) => {
                         exclude: ['password']
                     },
                     include: [
-                        { model: db.Markdown, attributes: ['description', 'contentHTML', 'contentMarkdown'] },
-                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        {
+                            model: db.Markdown, attributes: ['description', 'contentHTML', 'contentMarkdown']
+                        },
+                        {
+                            model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi']
+                        },
+                        {
+                            model: db.Doctor_Infor,
+                            attributes: {
+                                exclude: ['id', 'doctorId',]
+                            },
+                            include: [
+                                {
+                                    model: db.Allcode, as: 'priceTypeData', attributes: ['valueEn', 'valueVi']
+                                },
+                                {
+                                    model: db.Allcode, as: 'provinceTypeData', attributes: ['valueEn', 'valueVi']
+                                },
+                                {
+                                    model: db.Allcode, as: 'paymentTypeData', attributes: ['valueEn', 'valueVi']
+                                }
+                            ],
+                        },
                     ],
                     raw: false,
                     nest: true
